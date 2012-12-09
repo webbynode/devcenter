@@ -1,0 +1,89 @@
+--- 
+title: Troubleshooting
+---
+
+%h2 Troubleshooting
+
+%h3 Log files
+
+%p
+  In order to troubleshoot your application deployed with Rapp, we generate
+  log files.
+
+%p
+  
+
+%p
+  Rails application specific logs are kept on the default place, 
+  <code>/var/rapp/your_app/log/production.log</code>.
+  
+
+%p
+  Here we list some common issues with Rapp and the way to solve them.
+
+.entry.first
+  %b Problem: 
+  %p
+    %b Error "ActionView::Template::Error (some_resource isn't precompiled)"
+  %b Solution:
+  %p
+    You forgot to precompile your assets. Either log into your Webby
+    via SSH and precompile your assets:
+
+  %pre
+    %code
+      :preserve
+        $ cd /var/rapp/my_application
+        $ RAILS_ENV=production bundle exec rake assets:precompile
+
+  %p
+    Or add a new post-deployment hook to your app by running the following
+    command locally:
+
+  %pre
+    %code
+      :preserve
+        $ wn tasks add after_push RAILS_ENV=production bundle exec rake assets:precompile
+
+  %p
+    And then push your application again.
+
+.entry
+  %b Problem: 
+  %p
+    %b Error "Could not find a JavaScript runtime."
+  %br
+  %b Solution:
+  %p
+    Your application is missing a JavaScript runtime. A list of runtimes can
+    be found here: 
+    #{link_to "https://github.com/sstephenson/execjs", "https://github.com/sstephenson/execjs"}.
+
+  %p
+    You can take two approaches - one is adding the gem 
+    %b therubyracer
+    to your application's 
+    %b Gemfile
+    and pushing it again:
+
+  %pre
+    %code
+      :preserve
+        source :rubygems
+
+        (...)
+        gem 'therubyracer'
+        (...)
+
+  %p
+    The other is #{"<b>installing node.js</b>"} on your local machine. You can do that
+    by running the following:
+
+  %pre
+    %code
+      :preserve
+        $ sudo apt-get install -y python-software-properties
+        $ sudo add-apt-respository ppa:chris-lea/node.js
+        $ sudo apt-get update
+        $ sudo apt-get install node.js npm
+
